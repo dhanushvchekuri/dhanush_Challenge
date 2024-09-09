@@ -3,3 +3,4 @@
 /Infrastructure/my-key-pair.pem
 /Infrastructure/terraform.tfstate
 /.DS_Store
+/Infrastructure/terraform.tfstate.backup
