@@ -1,0 +1,5 @@
+/Infrastructure/.terraform/
+/Infrastructure/.terraform.lock.hcl
+/Infrastructure/my-key-pair.pem
+/Infrastructure/terraform.tfstate
+/.DS_Store
