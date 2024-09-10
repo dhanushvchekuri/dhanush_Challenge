@@ -4,3 +4,6 @@
 /Infrastructure/terraform.tfstate
 /.DS_Store
 /Infrastructure/terraform.tfstate.backup
+/Infrastructure/cert.crt
+/Infrastructure/csrfile.csr
+/Infrastructure/keyfile.key

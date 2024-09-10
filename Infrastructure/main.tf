@@ -89,13 +89,37 @@ resource "aws_instance" "webserver2" {
   user_data              = base64encode(file("userdata1.sh"))
 } 
 
+resource "aws_acm_certificate" "self_signed_cert" {
+  private_key       = file("keyfile.key")
+  certificate_body  = file("cert.crt")
+}
+
+resource "aws_security_group" "alb_sg" {
+  name        = "alb-security-group"
+  description = "Security group for the ALB"
+  vpc_id      = aws_vpc.myvpc.id
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 #create alb
 resource "aws_lb" "myalb" {
   name               = "myalb"
   internal           = false
   load_balancer_type = "application"
-
-  security_groups = [aws_security_group.webSg.id]
+  security_groups = [aws_security_group.alb_sg.id]
   subnets         = [aws_subnet.sub1.id, aws_subnet.sub2.id]
 
   tags = {
@@ -132,13 +156,15 @@ resource "aws_lb_target_group_attachment" "attach2" {
 
 resource "aws_lb_listener" "listener" {
   load_balancer_arn = aws_lb.myalb.arn
-  port              = 80
-  protocol          = "HTTP"
+  port              = 443
+  protocol          = "HTTPS"
 
   default_action {
     target_group_arn = aws_lb_target_group.tg.arn
     type             = "forward"
   }
+  ssl_policy = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+  certificate_arn   = aws_acm_certificate.self_signed_cert.arn
 }
 
 output "loadbalancerdns" {
