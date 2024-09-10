@@ -7,3 +7,4 @@
 /Infrastructure/cert.crt
 /Infrastructure/csrfile.csr
 /Infrastructure/keyfile.key
+main.tf

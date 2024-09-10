@@ -75,7 +75,24 @@ resource "aws_instance" "webserver1" {
   instance_type          = "t2.micro"
   vpc_security_group_ids = [aws_security_group.webSg.id]
   subnet_id              = aws_subnet.sub1.id
-  user_data              = base64encode(file("userdata.sh"))
+  user_data = base64encode(
+    <<-EOF
+      #!/bin/bash
+      apt-get update -y
+      apt-get install -y docker.io
+
+      systemctl start docker
+      systemctl enable docker
+
+      usermod -aG docker ubuntu
+
+      # Pull the Docker image from ECR
+      docker pull dhanushvarmachekuri/static_html_image
+
+      # Run the Docker container exposed on port 80
+      docker run -d -p 80:80 dhanushvarmachekuri/static_html_image
+    EOF
+  )
   key_name = "my-key-pair"
   associate_public_ip_address = true
 }
@@ -86,8 +103,27 @@ resource "aws_instance" "webserver2" {
   instance_type          = "t2.micro"
   vpc_security_group_ids = [aws_security_group.webSg.id]
   subnet_id              = aws_subnet.sub2.id
-  user_data              = base64encode(file("userdata1.sh"))
-} 
+  user_data = base64encode(
+    <<-EOF
+      #!/bin/bash
+      apt-get update -y
+      apt-get install -y docker.io
+
+      systemctl start docker
+      systemctl enable docker
+
+      usermod -aG docker ubuntu
+
+      # Pull the Docker image from ECR
+      docker pull dhanushvarmachekuri/static_html_image
+
+      # Run the Docker container exposed on port 80
+      docker run -d -p 80:80 dhanushvarmachekuri/static_html_image
+    EOF
+  )
+  key_name                    = "my-key-pair"
+  associate_public_ip_address = true
+}
 
 resource "aws_acm_certificate" "self_signed_cert" {
   private_key       = file("keyfile.key")
